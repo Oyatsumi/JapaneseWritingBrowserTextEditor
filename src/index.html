@@ -1,0 +1,240 @@
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>日本語のテキストエディター | Online Japanese Text Editor</title>
+	  <meta name="author" content="Erick Oliveira Rodrigues" />
+
+	  <meta name="description" content="Online Japanese Text Editor for Katakana and Hiragana instant conversion when typed." />
+
+	  <meta name="keywords" content="hiragana, katakana, japanese, text, editor, online" />
+
+<META http-equiv="Content-Type" content="text/html; charset=EUC-JP" />
+    <style type="text/css">
+        html, body { margin: 0; padding: 0; }
+        html, body { height: 100%; overflow: hidden;}.
+		.aBox {
+		color: #000000;
+		padding: 0px;
+		margin:0px;
+		position: relative;
+		}.
+		aBar {
+		cursor: move;
+		font-weight: bold;
+		font-size:12px;
+		padding: 2px 1em 2px 1em;
+		}
+		.aContent {
+		padding: 10px;
+		}
+    </style>
+
+
+<!-- TinyMCE -->
+<script type="text/javascript" src="./jscripts/tiny_mce/tiny_mce.js"></script>
+<script type="text/javascript" src="drag.js"></script>
+<script type="text/javascript" src="imagens/jp.js"></script>
+<script type="text/javascript">
+var lengthchar = 192;
+var roomaji = true;
+var hiragana = false;
+var katakana = false;
+
+function ativar(nome){
+	if (nome == 'roomaji'){roomaji = true; hiragana = false; katakana = false; document.getElementById('alfaimg').style.backgroundImage = "url('imagens/rop1.png')";}
+	if (nome == 'hiragana'){roomaji = false; hiragana = true; katakana = false; document.getElementById('alfaimg').style.backgroundImage = "url('imagens/hip1.png')";}
+	if (nome == 'katakana'){roomaji = false; hiragana = false; katakana = true; document.getElementById('alfaimg').style.backgroundImage = "url('imagens/kap1.png')";}
+	document.getElementById('abrirjanela').style.visibility = 'hidden';
+	tinyMCE.execInstanceCommand('elm3',"mceInsertContent",false,'');
+}
+
+function puxar (){
+		document.getElementById('abrirjanela').style.left = parseInt(document.getElementById('boxToDrag').style.left) + 79 + "px";
+		document.getElementById('abrirjanela').style.top = parseInt(document.getElementById('boxToDrag').style.top) + 16 + "px";
+		document.getElementById('abrirjanela').style.visibility = "visible";
+}
+
+function mudarcor (itempassado){
+		itempassado.style.background='#cccccc';
+}
+
+function mudarcorout (itempassado){
+		itempassado.style.background='#ffffff';
+}
+
+function checkContentLength(editorObject, e){
+    var content = editorObject.getContent();
+	var unicode=e.keyCode? e.keyCode : e.charCode;
+	var string = String.fromCharCode(unicode);
+	var conteudo = document.getElementById('caract').innerHTML;
+	if (((unicode == 13) || (unicode == 32) || (unicode == 8)) && (conteudo != '')){
+		tinymce.dom.Event.cancel(e);
+		conteudo = conteudo.replace(/(\r\n|\n|\r)/gm,"");
+		if (unicode != 8){tinyMCE.execInstanceCommand('elm3',"mceInsertContent",false,conteudo);}
+		document.getElementById('caract').innerHTML = '';
+	}
+	
+		//jp, outro arquivo
+		var teste1 = true;
+		if (hiragana == true){teste1 = casosespeciais(unicode); passaralfa(string, e, 'hiragana');}
+		if (katakana == true){teste1 = casosespeciais(unicode); passaralfa(string, e, 'katakana');}
+		if (teste1 == false){tinymce.dom.Event.cancel(e);}
+	
+	//tinyMCE.execInstanceCommand('elm3',"mceInsertContent",false,"This is the text to be inserted");
+	//if ((e.charCode || e.keyCode) == 'a'.charCodeAt(0)){tinymce.dom.Event.cancel(e);}
+
+	//tamanho dos caracteres abaixo
+    var noHtmlContent = content.replace(/<.*?>/g, '');
+	noHtmlContent = noHtmlContent.replace(' ', ''); 
+	noHtmlContent = noHtmlContent.replace(/(\r\n|\n|\r)/gm,"");
+	noHtmlContent = noHtmlContent.replace(/(&nbsp;)*/g,"");
+    lengthchar = noHtmlContent.length;//o nohtmlcontent retorna o html do texto.
+	document.getElementById('caracteres').innerHTML = lengthchar;
+
+}
+
+
+
+
+	tinyMCE.init({
+		setup : function (theEditor) {
+	    theEditor.onKeyPress.add(
+		    function (theEditor, e) {
+		        checkContentLength(theEditor, e);
+				
+		    }
+		);
+	},
+	
+	       
+		
+		// General options
+		mode : "exact",
+		elements : "elm3",
+		theme : "advanced",
+		skin : "o2k7",
+		skin_variant : "silver",
+		
+		
+		
+		plugins : "pagebreak,style,layer,table,save,advhr,advimage,advlink,emotions,iespell,inlinepopups,insertdatetime,preview,media,searchreplace,print,contextmenu,paste,directionality,fullscreen,noneditable,visualchars,nonbreaking,xhtmlxtras,template,wordcount,advlist,autosave",
+
+		// Theme options
+		theme_advanced_buttons1 : "newdocument,|,bold,italic,underline,strikethrough,|,justifyleft,justifycenter,justifyright,justifyfull,styleselect,formatselect,fontselect,fontsizeselect",
+		theme_advanced_buttons2 : "cut,copy,paste,pastetext,pasteword,|,search,replace,|,bullist,numlist,|,outdent,indent,blockquote,|,undo,redo,|,link,unlink,anchor,image,cleanup,code,|,insertdate,inserttime,preview",
+		theme_advanced_buttons3 : "tablecontrols,|,hr,removeformat,visualaid,|,sub,sup,|,charmap,emotions,iespell,media,advhr,|,print,|,ltr,rtl",
+		theme_advanced_buttons4 : "insertlayer,moveforward,movebackward,absolute,|,styleprops,|,cite,abbr,acronym,del,ins,attribs,|,visualchars,nonbreaking,template,pagebreak,restoredraft,|,forecolor,backcolor",
+		theme_advanced_toolbar_location : "top",
+		theme_advanced_toolbar_align : "left",
+		theme_advanced_statusbar_location : "bottom",
+		theme_advanced_resizing : false,
+
+		// Example content CSS (should be your site CSS)
+		content_css : "css/content.css",
+
+		// Drop lists for link/image/media/template dialogs
+		template_external_list_url : "lists/template_list.js",
+		external_link_list_url : "lists/link_list.js",
+		external_image_list_url : "lists/image_list.js",
+		media_external_list_url : "lists/media_list.js",
+
+		// Style formats
+		style_formats : [
+			{title : 'Bold text', inline : 'b'},
+			{title : 'Red text', inline : 'span', styles : {color : '#ff0000'}},
+			{title : 'Red header', block : 'h1', styles : {color : '#ff0000'}},
+			{title : 'Example 1', inline : 'span', classes : 'example1'},
+			{title : 'Example 2', inline : 'span', classes : 'example2'},
+			{title : 'Table styles'},
+			{title : 'Table row 1', selector : 'tr', classes : 'tablerow1'}
+		],
+
+		// Replace values for the template plugin
+		template_replace_values : {
+			username : "Some User",
+			staffid : "991234"
+		}
+		
+		
+		
+});
+
+
+
+</script>
+<!-- /TinyMCE -->
+
+</head>
+<body>
+<div style="position:relative" onClick="document.getElementById('avisopreto').style.visibility='hidden'"> <!--div 1 !-->
+<div style="z-index:0"><!--div 2 !-->
+<form method="post">
+
+		
+			<textarea id="elm3" name="elm3" style="width: 100%; height:100%">
+<p><span style="font-size: large;">Feel free to enjoy writing.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: large;">You can write in hiragana.</span></p>
+<p><span style="font-size: large;">ひらがなでかくことができます。</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: large;">As well as in katakana.</span></p>
+<p><span style="font-size: large;">カタカナデカクコトガデキマス。<br /></span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: x-large;"><strong>Credits:</strong></span></p>
+<p><span style="font-size: large;">Text Editor - TinyMCE</span></p>
+<p><span style="font-size: large;">Japanese Implementation - &Eacute;rick Oliveira Rodrigues</span></p>
+			</textarea>
+		
+
+</form>
+</div><!--fim div 2 !-->
+
+<!--div 3 !-->
+<div id="boxToDrag" class="aBox" style="z-index:1;position:absolute;top: 79px;left: 443px;background-image:url('imagens/novomenufundo.png');background-position:0px -25px;width:94px;height:25px">
+
+
+
+<div style="position:relative; width:100%;height:100%"><!--div 4 !-->
+
+<div style="position:absolute;top:4px;left:5px;width:20px;height:18px;cursor: move;" onMouseDown="javascript:dragStart(event, 'boxToDrag'); document.getElementById('abrirjanela').style.visibility='hidden'" class="aBar" onmouseover="document.getElementById('boxToDrag').style.backgroundPosition = '0px -0px';" onmouseout="document.getElementById('boxToDrag').style.backgroundPosition = '0px -25px';">
+</div>
+
+
+
+
+<div id="caract" style="position:absolute;top:2px;left:35px;width:34px;height:15px;text-align:center" onClick="this.innerHTML = ''"></div>
+
+<div id="alfaimg" style="position:absolute;top:4px;left:72px;width:17px;height:17px;cursor:pointer;background-image:url('imagens/rop1.png')" onClick="puxar()"  onmouseover="document.getElementById('boxToDrag').style.backgroundPosition = '0px -50px';" onmouseout="document.getElementById('boxToDrag').style.backgroundPosition = '0px -25px';">
+</div>
+
+
+</div><!--fim div 4 !-->
+
+
+
+
+</div><!--fim div 3 !-->
+
+
+<!--nova div!-->
+<div id="abrirjanela" style="z-index:4;position:absolute;top:10px;border: solid 1px;background-color:white;visibility:hidden;font-family: tahoma;">
+<div style="display:block;cursor:pointer" onMouseOver="mudarcor(this)" onMouseOut="mudarcorout(this)" onClick="ativar('roomaji')">Roomaji/ローマ字</div>
+<div style="display:block;cursor:pointer" onMouseOver="mudarcor(this)" onMouseOut="mudarcorout(this)" onClick="ativar('hiragana')">Hiragana/ひらがな</div>
+<div style="display:block;cursor:pointer" onMouseOver="mudarcor(this)" onMouseOut="mudarcorout(this)" onClick="ativar('katakana')">Katakana/カタカナ</div>
+</div><!--fim nova div!-->
+
+<!--nova div 2!-->
+<div id="avisopreto" style="z-index:3;width:550px;height:200px;position:absolute;top:5px;left:15px;background-image:url('imagens/aviso.png')">
+</div><!--fim nova div 2!-->
+
+
+</div><!--fim div 1 !-->
+
+
+
+<script type="text/javascript">
+if (document.location.protocol == 'file:') {
+	alert("The examples might not work properly on the local file system due to security settings in your browser. Please use a real webserver.");
+}
+</script>
+</body>
+</html>
